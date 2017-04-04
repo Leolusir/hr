@@ -10,4 +10,9 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 public class WebCtrl {
 
+//    @RequestMapping("/")
+//    public String index(){
+//        return "index";
+//    }
+
 }

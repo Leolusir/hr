@@ -6,6 +6,8 @@ import com.devils.hr.service.SchoolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+
 /**
  * Created by AndyL on 2017/4/2.
  */
@@ -17,6 +19,9 @@ public class SchoolServiceImpl implements SchoolService {
 
     @Override
     public School save(School school) {
+        long currentTime = Clock.systemDefaultZone().millis();
+        school.setUpdateTime(currentTime);
+        school.setCreateTime(currentTime);
         return schoolRepo.save(school);
     }
 
@@ -32,6 +37,7 @@ public class SchoolServiceImpl implements SchoolService {
 
     @Override
     public School update(School school) {
+        school.setUpdateTime(Clock.systemDefaultZone().millis());
         return schoolRepo.save(school);
     }
 

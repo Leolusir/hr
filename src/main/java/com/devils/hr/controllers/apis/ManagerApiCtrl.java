@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,10 +57,6 @@ public class ManagerApiCtrl {
         manager.setName(name);
         manager.setRole(Constants.MANAGER_ROLE_READ_WRITE);
         manager.setStatus(Status.MANAGER_ACTIVATED);
-
-        long currentTime = Clock.systemDefaultZone().millis();
-        manager.setUpdateTime(currentTime);
-        manager.setCreateTime(currentTime);
 
         Manager newManager = managerService.save(manager);
 

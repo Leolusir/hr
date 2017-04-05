@@ -6,6 +6,8 @@ import com.devils.hr.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+
 /**
  * Created by AndyL on 2017/4/4.
  */
@@ -17,6 +19,9 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public Manager save(Manager manager) {
+        long currentTime = Clock.systemDefaultZone().millis();
+        manager.setUpdateTime(currentTime);
+        manager.setCreateTime(currentTime);
         return managerRepo.save(manager);
     }
 
@@ -32,6 +37,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public Manager update(Manager manager) {
+        manager.setUpdateTime(Clock.systemDefaultZone().millis());
         return managerRepo.save(manager);
     }
 

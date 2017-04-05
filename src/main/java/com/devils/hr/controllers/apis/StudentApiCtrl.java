@@ -96,4 +96,32 @@ public class StudentApiCtrl {
         return RespFactory.getInstance().createRespSuccess(result);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/login")
+    public RespWrapper login(@RequestParam(required = false) long   number,
+                             @RequestParam(required = false) String phone,
+                             @RequestParam(required = true)  String password){
+        if(number < 1 && StringUtils.isEmpty(phone)){
+            return RespFactory.getInstance().createRespErrorWithCustomeMsg("请输入手机号或学号");
+        }
+
+        if(StringUtils.isEmpty(password)){
+            return RespFactory.getInstance().createRespErrorWithCustomeMsg("请输入密码");
+        }
+
+        Student student = studentService.findByNumberOrPhone(number, phone);
+
+        if(student == null || StringUtils.isEmpty(student.getId())){
+            return RespFactory.getInstance().createRespErrorWithCustomeMsg("未找到该学生相关信息，检查手机号或学号填写是否有误");
+        }
+
+        if(!password.equals(student.getPassword())){
+            return RespFactory.getInstance().createRespErrorWithCustomeMsg("密码错误");
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", student.getId());
+        result.put("name", student.getName());
+
+        return RespFactory.getInstance().createRespSuccess(result);
+    }
 }

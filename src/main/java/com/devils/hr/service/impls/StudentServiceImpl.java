@@ -4,10 +4,9 @@ import com.devils.hr.pojo.roles.Student;
 import com.devils.hr.repository.StudentRepo;
 import com.devils.hr.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDate;
 
 /**
@@ -17,13 +16,13 @@ import java.time.LocalDate;
 public class StudentServiceImpl implements StudentService {
 
     @Autowired
-    private MongoTemplate mongoTemplate;
-
-    @Autowired
     private StudentRepo studentRepo;
 
     @Override
     public Student save(Student student) {
+        long currentTime = Clock.systemDefaultZone().millis();
+        student.setUpdateTime(currentTime);
+        student.setCreateTime(currentTime);
         return studentRepo.save(student);
     }
 
@@ -39,7 +38,13 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student update(Student student) {
+        student.setUpdateTime(Clock.systemDefaultZone().millis());
         return studentRepo.save(student);
+    }
+
+    @Override
+    public Student findByNumberOrPhone(long number, String phone) {
+        return studentRepo.findByNumberOrPhone(number, phone);
     }
 
     @Override
@@ -51,9 +56,7 @@ public class StudentServiceImpl implements StudentService {
     public long generateNumber() {
         LocalDate today = LocalDate.now();
         int year = today.getYear();
-
-        Query query = new Query();
-        long count = mongoTemplate.count(query, Student.class);
+        long count = studentRepo.count();
 
         return year * 1000000 + count + 1;
     }

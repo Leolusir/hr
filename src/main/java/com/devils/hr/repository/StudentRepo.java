@@ -12,4 +12,6 @@ public interface StudentRepo extends MongoRepository<Student, String>{
 
     Student findByIDNumber(String IDNumber);
 
+    Student findByNumberOrPhone(long number, String phone);
+
 }

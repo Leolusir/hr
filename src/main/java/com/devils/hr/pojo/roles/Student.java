@@ -2,6 +2,7 @@ package com.devils.hr.pojo.roles;
 
 import com.devils.hr.pojo.modules.Image;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -26,6 +27,7 @@ public class Student {
 
     private String birthday;    //yyyy-mm-dd
 
+    @Indexed
     private long   number;      //学号
 
     private String IDNumber;    //身份证号

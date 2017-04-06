@@ -1,7 +1,10 @@
 package com.devils.hr.service;
 
 import com.devils.hr.pojo.roles.Student;
+import com.devils.hr.responses.modules.Page;
 import com.devils.hr.service.base.BaseService;
+
+import java.util.List;
 
 /**
  * Created by AndyL on 2017/4/2.
@@ -20,6 +23,11 @@ public interface StudentService extends BaseService<Student> {
      * @param IDNumber  身份证号
      * */
     Student findByIDNumber(String IDNumber);
+
+    /**
+     * 按学号顺序分页获取学生信息
+     * */
+    List<Student> findByPageInNumber(Page page);
 
     /**
      * 生成学号

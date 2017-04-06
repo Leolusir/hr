@@ -1,22 +1,18 @@
-package com.devils.hr.pojo.roles;
+package com.devils.hr.responses.modules;
 
 import com.devils.hr.pojo.modules.Image;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.devils.hr.pojo.roles.Manager;
+
+import java.io.Serializable;
 
 /**
- * Created by AndyL on 2017/4/4.
+ * Created by AndyL on 2017/4/6.
  */
-@Document(collection = "manager")
-public class Manager {
+public class ManagerResp implements Serializable{
 
-    @Id private String id;
-
-    private int    status;
+    private String id;
 
     private String username;
-
-    private String password;
 
     private String phone;
 
@@ -26,7 +22,7 @@ public class Manager {
 
     private String desc;
 
-    private Image  photo;
+    private Image photo;
 
     private String role;
 
@@ -36,28 +32,18 @@ public class Manager {
 
     private long   lastLoginTime;
 
-    private long   updateTime;
-
-    private long   createTime;
-
-    public Manager() {}
-
-    public Manager(String id, int status, String username, String password, String phone, String email, String name, String desc, Image photo, String role, String lastLoginIP, String lastLoginCity, long lastLoginTime, long updateTime, long createTime) {
-        this.id = id;
-        this.status = status;
-        this.username = username;
-        this.password = password;
-        this.phone = phone;
-        this.email = email;
-        this.name = name;
-        this.desc = desc;
-        this.photo = photo;
-        this.role = role;
-        this.lastLoginIP = lastLoginIP;
-        this.lastLoginCity = lastLoginCity;
-        this.lastLoginTime = lastLoginTime;
-        this.updateTime = updateTime;
-        this.createTime = createTime;
+    public ManagerResp(Manager manager) {
+        this.id = manager.getId();
+        this.username = manager.getUsername();
+        this.phone = manager.getPhone();
+        this.email = manager.getEmail();
+        this.name = manager.getName();
+        this.desc = manager.getDesc();
+        this.photo = manager.getPhoto();
+        this.role = manager.getRole();
+        this.lastLoginIP = manager.getLastLoginIP();
+        this.lastLoginCity = manager.getLastLoginCity();
+        this.lastLoginTime = manager.getLastLoginTime();
     }
 
     public String getId() {
@@ -68,28 +54,12 @@ public class Manager {
         this.id = id;
     }
 
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getPhone() {
@@ -164,36 +134,20 @@ public class Manager {
         this.lastLoginTime = lastLoginTime;
     }
 
-    public long getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(long updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public long getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(long createTime) {
-        this.createTime = createTime;
-    }
-
     @Override
     public String toString() {
-        return "Manager{" +
+        return "ManagerResp{" +
                 "id='" + id + '\'' +
-                ", status=" + status +
                 ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 ", name='" + name + '\'' +
+                ", desc='" + desc + '\'' +
                 ", photo=" + photo +
                 ", role='" + role + '\'' +
-                ", updateTime=" + updateTime +
-                ", createTime=" + createTime +
+                ", lastLoginIP='" + lastLoginIP + '\'' +
+                ", lastLoginCity='" + lastLoginCity + '\'' +
+                ", lastLoginTime=" + lastLoginTime +
                 '}';
     }
 }

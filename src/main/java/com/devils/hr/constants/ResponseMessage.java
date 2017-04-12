@@ -3,7 +3,7 @@ package com.devils.hr.constants;
 /**
  * Created by AndyL on 2016/8/16.
  */
-public class ResponseStr {
+public class ResponseMessage {
 
     public static final String SUCCESS = "success";
 

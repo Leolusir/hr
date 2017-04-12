@@ -1,5 +1,7 @@
-package com.devils.hr.pojo.roles;
+package com.devils.hr.pojo.records;
 
+import com.devils.hr.pojo.roles.Student;
+import com.devils.hr.pojo.roles.Subject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;

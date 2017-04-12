@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * Created by AndyL on 2017/4/6.
  */
-public class ManagerResp implements Serializable{
+public class ManagerResp implements Serializable {
 
     private String id;
 

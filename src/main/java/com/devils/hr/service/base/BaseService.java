@@ -20,6 +20,8 @@ public interface BaseService<T> {
      * */
     T findOneById(String id);
 
+    long count();
+
     /**
      * 改
      * */

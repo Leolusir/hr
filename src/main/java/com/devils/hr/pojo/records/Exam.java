@@ -1,5 +1,7 @@
-package com.devils.hr.pojo.roles;
+package com.devils.hr.pojo.records;
 
+import com.devils.hr.pojo.roles.SClass;
+import com.devils.hr.pojo.roles.Subject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,8 +12,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "exam")
 public class Exam {
 
+    /**
+     * 考试类型
+     * */
+    public static final int TYPE_GRADE = 1; //年级考试
+
     @Id
     private String  id;
+
+    private int     type;       //统考？班级自测？
 
     private String  name;
 
@@ -26,20 +35,25 @@ public class Exam {
     @DBRef
     private Subject subject;    //考试科目
 
+    @DBRef
+    private SClass  sClass;     //班级(可选)
+
     private long    updateTime;
 
     private long    createTime;
 
     public Exam() {}
 
-    public Exam(String id, String name, String desc, int year, int month, int day, Subject subject, long updateTime, long createTime) {
+    public Exam(String id, int type, String name, String desc, int year, int month, int day, Subject subject, SClass sClass, long updateTime, long createTime) {
         this.id = id;
+        this.type = type;
         this.name = name;
         this.desc = desc;
         this.year = year;
         this.month = month;
         this.day = day;
         this.subject = subject;
+        this.sClass = sClass;
         this.updateTime = updateTime;
         this.createTime = createTime;
     }
@@ -50,6 +64,14 @@ public class Exam {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getName() {
@@ -98,6 +120,14 @@ public class Exam {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
+    }
+
+    public SClass getsClass() {
+        return sClass;
+    }
+
+    public void setsClass(SClass sClass) {
+        this.sClass = sClass;
     }
 
     public long getUpdateTime() {

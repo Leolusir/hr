@@ -1,8 +1,8 @@
 package com.devils.hr.service.impls;
 
 import com.devils.hr.pojo.roles.Student;
+import com.devils.hr.querys.Page;
 import com.devils.hr.repository.StudentRepo;
-import com.devils.hr.responses.modules.Page;
 import com.devils.hr.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student save(Student student) {
-        long currentTime = Clock.systemDefaultZone().millis();
+        long currentTime = System.currentTimeMillis();
         student.setUpdateTime(currentTime);
         student.setCreateTime(currentTime);
         return studentRepo.save(student);
@@ -46,8 +45,13 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    public long count() {
+        return studentRepo.count();
+    }
+
+    @Override
     public Student update(Student student) {
-        student.setUpdateTime(Clock.systemDefaultZone().millis());
+        student.setUpdateTime(System.currentTimeMillis());
         return studentRepo.save(student);
     }
 
@@ -81,7 +85,7 @@ public class StudentServiceImpl implements StudentService {
     public long generateNumber() {
         LocalDate today = LocalDate.now();
         int year = today.getYear();
-        long count = studentRepo.count();
+        long count = count();
 
         return year * 1000000 + count + 1;
     }

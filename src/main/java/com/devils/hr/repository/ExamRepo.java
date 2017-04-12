@@ -1,6 +1,6 @@
 package com.devils.hr.repository;
 
-import com.devils.hr.pojo.roles.Exam;
+import com.devils.hr.pojo.records.Exam;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

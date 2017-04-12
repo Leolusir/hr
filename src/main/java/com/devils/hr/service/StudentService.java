@@ -1,7 +1,7 @@
 package com.devils.hr.service;
 
 import com.devils.hr.pojo.roles.Student;
-import com.devils.hr.responses.modules.Page;
+import com.devils.hr.querys.Page;
 import com.devils.hr.service.base.BaseService;
 
 import java.util.List;

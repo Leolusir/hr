@@ -1,6 +1,6 @@
 package com.devils.hr.controllers.apis;
 
-import com.devils.hr.pojo.roles.Exam;
+import com.devils.hr.pojo.records.Exam;
 import com.devils.hr.pojo.roles.Subject;
 import com.devils.hr.responses.RespFactory;
 import com.devils.hr.responses.RespWrapper;
@@ -49,7 +49,7 @@ public class ExamApiCtrl {
                                @RequestParam(required = true)  int    day){
         Subject subject = subjectService.findOneById(subjectId);
         if(subject == null || StringUtils.isEmpty(subject.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("科目不存在");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("科目不存在");
         }
 
         Exam exam = new Exam();

@@ -6,8 +6,6 @@ import com.devils.hr.service.SClassService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
-
 /**
  * Created by AndyL on 2017/4/4.
  */
@@ -19,7 +17,7 @@ public class SClassServiceImpl implements SClassService {
 
     @Override
     public SClass save(SClass sClass) {
-        long currentTime = Clock.systemDefaultZone().millis();
+        long currentTime = System.currentTimeMillis();
         sClass.setUpdateTime(currentTime);
         sClass.setCreateTime(currentTime);
         return sClassRepo.save(sClass);
@@ -36,8 +34,13 @@ public class SClassServiceImpl implements SClassService {
     }
 
     @Override
+    public long count() {
+        return sClassRepo.count();
+    }
+
+    @Override
     public SClass update(SClass sClass) {
-        sClass.setUpdateTime(Clock.systemDefaultZone().millis());
+        sClass.setUpdateTime(System.currentTimeMillis());
         return sClassRepo.save(sClass);
     }
 }

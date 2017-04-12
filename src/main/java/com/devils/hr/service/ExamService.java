@@ -1,6 +1,6 @@
 package com.devils.hr.service;
 
-import com.devils.hr.pojo.roles.Exam;
+import com.devils.hr.pojo.records.Exam;
 import com.devils.hr.service.base.BaseService;
 
 /**

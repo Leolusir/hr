@@ -1,5 +1,6 @@
 package com.devils.hr.responses;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -12,6 +13,16 @@ public class RespWrapper {
     private String  message = null;
 
     private Map<String,Object> result = null;
+
+    public static RespWrapperBuilder builder(){
+        return new RespWrapperBuilder();
+    }
+
+    public RespWrapper(RespWrapperBuilder builder) {
+        this.status  = builder._status;
+        this.message = builder._message;
+        this.result  = builder._result;
+    }
 
     public RespWrapper(int status, String message) {
         this.status = status;
@@ -56,4 +67,55 @@ public class RespWrapper {
                 ", result=" + result +
                 '}';
     }
+
+    public static class RespWrapperBuilder {
+        private int     _status;
+        private String  _message;
+        private Map<String,Object> _result;
+
+
+        RespWrapperBuilder() {
+            _result = new HashMap<>();
+        }
+
+        public RespWrapperBuilder setStatus(int status) {
+            _status = status;
+            return this;
+        }
+
+        public RespWrapperBuilder setMessage(String message) {
+            _message = message;
+            return this;
+        }
+
+        public RespWrapperBuilder addIsEnd(boolean isEnd){
+            _result.put("isEnd", isEnd);
+            return this;
+        }
+
+        public RespWrapperBuilder addCount(long count){
+            _result.put("count", count);
+            return this;
+        }
+
+        public RespWrapperBuilder addTotalCount(long totalCount){
+            _result.put("totalCount", totalCount);
+            return this;
+        }
+
+        public RespWrapperBuilder addCursor(long cursor){
+            _result.put("cursor", cursor);
+            return this;
+        }
+
+        public RespWrapperBuilder addCustomParam(String name, Object value){
+            _result.put(name, value);
+            return this;
+        }
+
+        public RespWrapper build(){
+            return new RespWrapper(this);
+        }
+    }
+
 }

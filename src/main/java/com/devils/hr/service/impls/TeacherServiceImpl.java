@@ -6,8 +6,6 @@ import com.devils.hr.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
-
 /**
  * Created by AndyL on 2017/4/2.
  */
@@ -19,7 +17,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public Teacher save(Teacher teacher) {
-        long currentTime = Clock.systemDefaultZone().millis();
+        long currentTime = System.currentTimeMillis();
         teacher.setUpdateTime(currentTime);
         teacher.setCreateTime(currentTime);
         return teacherRepo.save(teacher);
@@ -36,8 +34,13 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
+    public long count() {
+        return teacherRepo.count();
+    }
+
+    @Override
     public Teacher update(Teacher teacher) {
-        teacher.setUpdateTime(Clock.systemDefaultZone().millis());
+        teacher.setUpdateTime(System.currentTimeMillis());
         return teacherRepo.save(teacher);
     }
 

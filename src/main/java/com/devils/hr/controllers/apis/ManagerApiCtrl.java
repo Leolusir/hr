@@ -1,13 +1,13 @@
 package com.devils.hr.controllers.apis;
 
 import com.devils.hr.configs.AppConfig;
-import com.devils.hr.constants.Constants;
-import com.devils.hr.constants.Status;
+import com.devils.hr.constants.ResponseMessage;
+import com.devils.hr.constants.ResponseStatus;
 import com.devils.hr.pojo.roles.Manager;
+import com.devils.hr.querys.ListQueryResult;
 import com.devils.hr.responses.RespFactory;
 import com.devils.hr.responses.RespWrapper;
 import com.devils.hr.responses.modules.ManagerResp;
-import com.devils.hr.responses.modules.Page;
 import com.devils.hr.service.ManagerService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Clock;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,7 +50,7 @@ public class ManagerApiCtrl {
 
         Manager existManager = managerService.findByUserName(username);
         if(existManager != null && !StringUtils.isEmpty(existManager.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("用户名已被注册");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("用户名已被注册");
         }
 
         Manager manager = new Manager();
@@ -60,8 +58,8 @@ public class ManagerApiCtrl {
         manager.setPassword(password);
         manager.setName(name);
         manager.setDesc(desc);
-        manager.setRole(Constants.MANAGER_ROLE_READ_WRITE);
-        manager.setStatus(Status.MANAGER_ACTIVATED);
+        manager.setRole(Manager.ROLE_READ_WRITE);
+        manager.setStatus(Manager.STATUS_ACTIVATED);
 
         Manager newManager = managerService.save(manager);
 
@@ -90,11 +88,11 @@ public class ManagerApiCtrl {
         Manager existManager = managerService.findByUserName(username);
 
         if(existManager == null || StringUtils.isEmpty(existManager.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("用户名或密码错误");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("用户名或密码错误");
         }
 
         if(!password.equals(existManager.getPassword())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("用户名或密码错误");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("用户名或密码错误");
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -119,10 +117,10 @@ public class ManagerApiCtrl {
     public RespWrapper findById(@PathVariable String id){
         Manager manager = managerService.findOneById(id);
         if(manager == null || StringUtils.isEmpty(manager.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("未找到该管理员");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("未找到该管理员");
         }
-        if(manager.getRole().equals(Constants.MANAGER_ROLE_ROOT)){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("没有权限查看该管理员信息");
+        if(manager.getRole().equals(Manager.ROLE_ROOT)){
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("没有权限查看该管理员信息");
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -143,33 +141,23 @@ public class ManagerApiCtrl {
      * */
     @ApiOperation(value = "分页查询所有管理员", notes = "cursor第一次请求传 0, 每次会返回新的 cursor 供前端请求下一页数据")
     @RequestMapping(method = RequestMethod.GET, value = "/list")
-    public RespWrapper findByPageInUpdateTime(@RequestParam(required = true,  defaultValue = "0") long cursor,
+    public RespWrapper findByPageInUpdateTime(@RequestParam(required = false, defaultValue = "0") long cursor,
                                               @RequestParam(required = false, defaultValue = "0") int  skip,
                                               @RequestParam(required = false, defaultValue = "0") int  count){
-        if(cursor == 0) cursor = Clock.systemDefaultZone().millis();
-        if(count == 0) count = AppConfig.dataQueryCount;
+        if(cursor == 0) cursor = System.currentTimeMillis();
+        if(count == 0) count = AppConfig.defaultDataQueryCount;
 
-        Page page = new Page(cursor, skip, count);
-        List<Manager> managers = managerService.findByPageInUpdateTime(page);
-        Boolean isEnd = managers == null || managers.size() < count;
+        ListQueryResult<Manager> managers = managerService.findByPageInUpdateTime(cursor, count, skip);
 
-        Map<String, Object> result = new HashMap<>();
-        if(managers == null || managers.size() < 1){
-            result.put("isEnd", true);
-            result.put("cursor", 0);
-            result.put("count", 0);
-            return RespFactory.getInstance().createRespSuccess(result);
-        }
-
-        List<ManagerResp> managerRespList = new ArrayList<>();
-        managers.forEach(manager -> managerRespList.add(new ManagerResp(manager)));
-
-        result.put("isEnd", isEnd);
-        result.put("cursor", isEnd ? 0 : managers.get(managers.size() - 1).getUpdateTime());
-        result.put("count", managerRespList.size());
-        result.put("managers", managerRespList);
-
-        return RespFactory.getInstance().createRespSuccess(result);
+        return RespWrapper.builder()
+                .setStatus(ResponseStatus.SUCCESS)
+                .setMessage(ResponseMessage.SUCCESS)
+                .addIsEnd(managers.isEnd())
+                .addCount(managers.getCount())
+                .addTotalCount(managers.getTotalCount())
+                .addCursor(cursor)
+                .addCustomParam("managers", managers.convertToResp(ManagerResp.class))
+                .build();
     }
 
     /**
@@ -181,11 +169,11 @@ public class ManagerApiCtrl {
     public RespWrapper deleteById(@PathVariable String id){
         Manager manager = managerService.findOneById(id);
         if(manager == null || StringUtils.isEmpty(manager.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("未找到该管理员");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("未找到该管理员");
         }
-        if(manager.getRole().equals(Constants.MANAGER_ROLE_ROOT)
-                || manager.getRole().equals(Constants.MANAGER_ROLE_AMIN)){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("无法删除系统管理员");
+        if(manager.getRole().equals(Manager.ROLE_ROOT)
+                || manager.getRole().equals(Manager.ROLE_ADMIN)){
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("无法删除系统管理员");
         }
 
         managerService.deleteById(id);

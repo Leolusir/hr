@@ -6,8 +6,6 @@ import com.devils.hr.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
-
 /**
  * Created by AndyL on 2017/4/5.
  */
@@ -19,7 +17,7 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public Subject save(Subject subject) {
-        long currentTime = Clock.systemDefaultZone().millis();
+        long currentTime = System.currentTimeMillis();
         subject.setUpdateTime(currentTime);
         subject.setCreateTime(currentTime);
         return subjectRepo.save(subject);
@@ -36,8 +34,13 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
+    public long count() {
+        return subjectRepo.count();
+    }
+
+    @Override
     public Subject update(Subject subject) {
-        subject.setUpdateTime(Clock.systemDefaultZone().millis());
+        subject.setUpdateTime(System.currentTimeMillis());
         return subjectRepo.save(subject);
     }
 

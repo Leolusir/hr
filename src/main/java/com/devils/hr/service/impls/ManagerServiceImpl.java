@@ -1,8 +1,8 @@
 package com.devils.hr.service.impls;
 
 import com.devils.hr.pojo.roles.Manager;
+import com.devils.hr.querys.ListQueryResult;
 import com.devils.hr.repository.ManagerRepo;
-import com.devils.hr.responses.modules.Page;
 import com.devils.hr.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
 import java.util.List;
 
 /**
@@ -28,7 +27,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public Manager save(Manager manager) {
-        long currentTime = Clock.systemDefaultZone().millis();
+        long currentTime = System.currentTimeMillis();
         manager.setUpdateTime(currentTime);
         manager.setCreateTime(currentTime);
         return managerRepo.save(manager);
@@ -45,8 +44,13 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
+    public long count() {
+        return managerRepo.count();
+    }
+
+    @Override
     public Manager update(Manager manager) {
-        manager.setUpdateTime(Clock.systemDefaultZone().millis());
+        manager.setUpdateTime(System.currentTimeMillis());
         return managerRepo.save(manager);
     }
 
@@ -56,18 +60,21 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public List<Manager> findByPageInUpdateTime(Page page) {
+    public ListQueryResult<Manager> findByPageInUpdateTime(long updateTimeCursor, int count, int skip) {
         Criteria criteria = new Criteria();
-        criteria.andOperator(Criteria.where("updateTime").lt(page.getCursor()));
+        criteria.andOperator(Criteria.where("updateTime").lt(updateTimeCursor));
 
         Query query = new Query();
         query.addCriteria(criteria);
         query.with(new Sort(Sort.Direction.DESC, "updateTime"))
-            .skip(page.getSkip())
-            .limit(page.getCount());
+            .skip(skip)
+            .limit(count);
 
-        List<Manager> managers = mongoTemplate.find(query, Manager.class);
+        List<Manager> managers      = mongoTemplate.find(query, Manager.class);
+        long          resultCount   = managers == null ? 0 : managers.size();
+        long          totalCount    = count();
+        boolean       isEnd         = resultCount < count;
 
-        return managers;
+        return ListQueryResult.create(managers, resultCount, totalCount, isEnd);
     }
 }

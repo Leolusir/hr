@@ -1,4 +1,4 @@
-package com.devils.hr.responses.modules;
+package com.devils.hr.querys;
 
 /**
  * Created by AndyL on 2017/4/6.

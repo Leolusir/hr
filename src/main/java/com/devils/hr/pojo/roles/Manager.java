@@ -10,7 +10,23 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "manager")
 public class Manager {
 
-    @Id private String id;
+    /**
+     * 管理员权限
+     * */
+    public static final String ROLE_ROOT = "root";
+    public static final String ROLE_ADMIN = "admin";
+    public static final String ROLE_READ = "read";
+    public static final String ROLE_READ_WRITE = "readWrite";
+
+    /**
+     * 状态
+     * */
+    public static final int STATUS_INACTIVATED = 0;    //未激活 即未绑定手机号
+    public static final int STATUS_ACTIVATED = 1;      //已激活
+
+
+    @Id
+    private String id;
 
     private int    status;
 

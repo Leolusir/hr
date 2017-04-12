@@ -1,13 +1,11 @@
 package com.devils.hr.controllers.apis;
 
 import com.devils.hr.configs.AppConfig;
-import com.devils.hr.constants.Constants;
-import com.devils.hr.constants.Status;
 import com.devils.hr.pojo.roles.Manager;
 import com.devils.hr.pojo.roles.Student;
 import com.devils.hr.responses.RespFactory;
 import com.devils.hr.responses.RespWrapper;
-import com.devils.hr.responses.modules.Page;
+import com.devils.hr.querys.Page;
 import com.devils.hr.responses.modules.StudentResp;
 import com.devils.hr.service.ManagerService;
 import com.devils.hr.service.StudentService;
@@ -63,27 +61,27 @@ public class StudentApiCtrl {
 
         Manager manager = managerService.findOneById(managerId);
         if(manager == null || StringUtils.isEmpty(manager.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("只有管理员才能操作");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("只有管理员才能操作");
         }
 
-        if(Constants.MANAGER_ROLE_READ.equals(manager.getRole())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("没有足够的权限");
+        if(Manager.ROLE_READ.equals(manager.getRole())){
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("没有足够的权限");
         }
 
         Student existStudent = studentService.findByIDNumber(IDNumber);
 
         if(existStudent != null && !StringUtils.isEmpty(existStudent.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("学生已存在,请检查学生姓名和身份证号填写是否有误");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("学生已存在,请检查学生姓名和身份证号填写是否有误");
         }
 
         Student student = new Student();
-        student.setStatus(Status.STUDENT_INACTIVATED);
+        student.setStatus(Student.STATUS_INACTIVATED);
         student.setName(name);
         student.setGender(gender);
         student.setBirthday(birthday);
         student.setIDNumber(IDNumber);
         student.setNumber(studentService.generateNumber());
-        student.setPassword(Constants.INIT_PASSWORD_MD5);
+        student.setPassword(AppConfig.INIT_PASSWORD_MD5);
 
         Student newStudent = studentService.save(student);
 
@@ -109,21 +107,21 @@ public class StudentApiCtrl {
                              @RequestParam(required = false) String phone,
                              @RequestParam(required = true)  String password){
         if(number < 1 && StringUtils.isEmpty(phone)){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("请输入手机号或学号");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("请输入手机号或学号");
         }
 
         if(StringUtils.isEmpty(password)){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("请输入密码");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("请输入密码");
         }
 
         Student student = studentService.findByNumberOrPhone(number, phone);
 
         if(student == null || StringUtils.isEmpty(student.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("未找到该学生相关信息，检查手机号或学号填写是否有误");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("未找到该学生相关信息，检查手机号或学号填写是否有误");
         }
 
         if(!password.equals(student.getPassword())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("密码错误");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("密码错误");
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -142,7 +140,7 @@ public class StudentApiCtrl {
     public RespWrapper findById(@PathVariable String id){
         Student student = studentService.findOneById(id);
         if(student == null || StringUtils.isEmpty(student.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("未查到该学生的信息");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("未查到该学生的信息");
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -165,7 +163,7 @@ public class StudentApiCtrl {
     public RespWrapper findByPageInNumber(@RequestParam(required = true,  defaultValue = "0") long cursor,
                                           @RequestParam(required = false, defaultValue = "0") int  count,
                                           @RequestParam(required = false, defaultValue = "0") int  skip){
-        if(count  == 0) count  = AppConfig.dataQueryCount;
+        if(count  == 0) count  = AppConfig.defaultDataQueryCount;
 
         Page page = new Page(cursor, skip, count);
         List<Student> students = studentService.findByPageInNumber(page);
@@ -199,7 +197,7 @@ public class StudentApiCtrl {
     public RespWrapper deleteById(@PathVariable String id){
         Student student = studentService.findOneById(id);
         if(student == null || StringUtils.isEmpty(student.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomeMsg("未查到该学生");
+            return RespFactory.getInstance().createRespErrorWithCustomMsg("未查到该学生");
         }
 
         studentService.deleteById(id);

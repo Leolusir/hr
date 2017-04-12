@@ -11,6 +11,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "student")
 public class Student {
 
+    /**
+     * 状态
+     * */
+    public static final int STATUS_INACTIVATED = 0;    //未激活 即未绑定手机号
+    public static final int STATUS_ACTIVATED = 1;      //已激活
+
     @Id private String id;
 
     private int    status;

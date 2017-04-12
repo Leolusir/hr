@@ -1,8 +1,9 @@
 package com.devils.hr.responses;
 
-import com.devils.hr.constants.ResponseCode;
-import com.devils.hr.constants.ResponseStr;
+import com.devils.hr.constants.ResponseStatus;
+import com.devils.hr.constants.ResponseMessage;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -25,26 +26,26 @@ public class RespFactory extends AbstractRespFactory{
 
     @Override
     public RespWrapper createRespSuccess(Map<String, Object> result) {
-        return new RespWrapper(ResponseCode.SUCCESS, ResponseStr.SUCCESS, result);
+        return new RespWrapper(ResponseStatus.SUCCESS, ResponseMessage.SUCCESS, result);
     }
 
     @Override
     public RespWrapper createRespParamsIsNull(String... params) {
-        return new RespWrapper(ResponseCode.PARAMS_IS_NULL, ResponseStr.PARAMS_IS_NULL + params.toString());
+        return new RespWrapper(ResponseStatus.PARAMS_IS_NULL, ResponseMessage.PARAMS_IS_NULL + Arrays.toString(params));
     }
 
     @Override
     public RespWrapper createRespNotFound() {
-        return new RespWrapper(ResponseCode.NOT_FOUND, ResponseStr.NOT_FOUND);
+        return new RespWrapper(ResponseStatus.NOT_FOUND, ResponseMessage.NOT_FOUND);
     }
 
     @Override
-    public RespWrapper createRespErrorWithCustomeMsg(String message) {
-        return new RespWrapper(ResponseCode.ERROR_WITH_CUNTOME_MESSAGE, message);
+    public RespWrapper createRespErrorWithCustomMsg(String message) {
+        return new RespWrapper(ResponseStatus.ERROR_WITH_CUNTOME_MESSAGE, message);
     }
 
     @Override
     public RespWrapper createRespError() {
-        return new RespWrapper(ResponseCode.ERROR, ResponseStr.ERROR);
+        return new RespWrapper(ResponseStatus.ERROR, ResponseMessage.ERROR);
     }
 }

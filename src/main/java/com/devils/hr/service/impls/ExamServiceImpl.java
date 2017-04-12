@@ -1,12 +1,10 @@
 package com.devils.hr.service.impls;
 
-import com.devils.hr.pojo.roles.Exam;
+import com.devils.hr.pojo.records.Exam;
 import com.devils.hr.repository.ExamRepo;
 import com.devils.hr.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.Clock;
 
 /**
  * Created by AndyL on 2017/4/5.
@@ -19,7 +17,7 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public Exam save(Exam exam) {
-        long currentTime = Clock.systemDefaultZone().millis();
+        long currentTime = System.currentTimeMillis();
         exam.setUpdateTime(currentTime);
         exam.setCreateTime(currentTime);
         return examRepo.save(exam);
@@ -36,8 +34,13 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
+    public long count() {
+        return examRepo.count();
+    }
+
+    @Override
     public Exam update(Exam exam) {
-        exam.setUpdateTime(Clock.systemDefaultZone().millis());
+        exam.setUpdateTime(System.currentTimeMillis());
         return examRepo.save(exam);
     }
 }

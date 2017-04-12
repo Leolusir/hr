@@ -15,7 +15,7 @@ public abstract class AbstractRespFactory {
 
     public abstract RespWrapper createRespNotFound();
 
-    public abstract RespWrapper createRespErrorWithCustomeMsg(String message);
+    public abstract RespWrapper createRespErrorWithCustomMsg(String message);
 
     public abstract RespWrapper createRespError();
 

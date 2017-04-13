@@ -5,7 +5,6 @@ import com.devils.hr.pojo.roles.Manager;
 import com.devils.hr.pojo.roles.Student;
 import com.devils.hr.querys.ListQueryResult;
 import com.devils.hr.querys.SingleQueryResult;
-import com.devils.hr.responses.RespFactory;
 import com.devils.hr.responses.RespWrapper;
 import com.devils.hr.responses.modules.StudentResp;
 import com.devils.hr.service.ManagerService;
@@ -162,7 +161,7 @@ public class StudentApiCtrl {
                 .addCount(listQueryResult.getCount())
                 .addTotalCount(listQueryResult.getTotalCount())
                 .addIsEnd(listQueryResult.isEnd())
-                .addCursor(listQueryResult.getLastElement() == null ? 0 : listQueryResult.getLastElement().getNumber())
+                .addCursor(cursor)
                 .addCustomParam("students", listQueryResult.convertToResp(StudentResp.class))
                 .build();
     }
@@ -181,6 +180,8 @@ public class StudentApiCtrl {
 
         studentService.deleteById(id);
 
-        return RespFactory.getInstance().createRespSuccess();
+        return RespWrapper.builder()
+                .success()
+                .build();
     }
 }

@@ -3,7 +3,6 @@ package com.devils.hr.controllers.apis;
 import com.devils.hr.pojo.records.Exam;
 import com.devils.hr.pojo.roles.Subject;
 import com.devils.hr.querys.SingleQueryResult;
-import com.devils.hr.responses.RespFactory;
 import com.devils.hr.responses.RespWrapper;
 import com.devils.hr.service.ExamService;
 import com.devils.hr.service.SubjectService;
@@ -48,7 +47,7 @@ public class ExamApiCtrl {
         SingleQueryResult<Subject> singleQueryResult = subjectService.findOneById(subjectId);
         if(singleQueryResult.getOne() == null ||
                 StringUtils.isEmpty(singleQueryResult.getOne().getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("科目不存在");
+            return RespWrapper.builder().notFound("科目不存在").build();
         }
 
         Exam exam = new Exam();

@@ -1,6 +1,7 @@
 package com.devils.hr.service.impls;
 
 import com.devils.hr.pojo.roles.Subject;
+import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.repository.SubjectRepo;
 import com.devils.hr.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,11 @@ public class SubjectServiceImpl implements SubjectService {
     private SubjectRepo subjectRepo;
 
     @Override
-    public Subject save(Subject subject) {
+    public SingleQueryResult<Subject> save(Subject subject) {
         long currentTime = System.currentTimeMillis();
         subject.setUpdateTime(currentTime);
         subject.setCreateTime(currentTime);
-        return subjectRepo.save(subject);
+        return SingleQueryResult.create(subjectRepo.save(subject));
     }
 
     @Override
@@ -29,8 +30,8 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Subject findOneById(String id) {
-        return subjectRepo.findOne(id);
+    public SingleQueryResult<Subject> findOneById(String id) {
+        return SingleQueryResult.create(subjectRepo.findOne(id));
     }
 
     @Override
@@ -39,13 +40,13 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Subject update(Subject subject) {
+    public SingleQueryResult<Subject> update(Subject subject) {
         subject.setUpdateTime(System.currentTimeMillis());
-        return subjectRepo.save(subject);
+        return SingleQueryResult.create(subjectRepo.save(subject));
     }
 
     @Override
-    public Subject findByName(String name) {
-        return subjectRepo.findByName(name);
+    public SingleQueryResult<Subject> findByName(String name) {
+        return SingleQueryResult.create(subjectRepo.findByName(name));
     }
 }

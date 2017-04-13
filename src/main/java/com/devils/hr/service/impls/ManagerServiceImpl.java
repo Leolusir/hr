@@ -2,6 +2,7 @@ package com.devils.hr.service.impls;
 
 import com.devils.hr.pojo.roles.Manager;
 import com.devils.hr.querys.ListQueryResult;
+import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.repository.ManagerRepo;
 import com.devils.hr.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,12 @@ public class ManagerServiceImpl implements ManagerService {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Manager save(Manager manager) {
+    public SingleQueryResult<Manager> save(Manager manager) {
         long currentTime = System.currentTimeMillis();
         manager.setUpdateTime(currentTime);
         manager.setCreateTime(currentTime);
-        return managerRepo.save(manager);
+        return SingleQueryResult.create(managerRepo.save(manager));
+
     }
 
     @Override
@@ -39,8 +41,8 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public Manager findOneById(String id) {
-        return managerRepo.findOne(id);
+    public SingleQueryResult<Manager> findOneById(String id) {
+        return SingleQueryResult.create(managerRepo.findOne(id));
     }
 
     @Override
@@ -49,14 +51,14 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public Manager update(Manager manager) {
+    public SingleQueryResult<Manager> update(Manager manager) {
         manager.setUpdateTime(System.currentTimeMillis());
-        return managerRepo.save(manager);
+        return SingleQueryResult.create(managerRepo.save(manager));
     }
 
     @Override
-    public Manager findByUserName(String username) {
-        return managerRepo.findByUsername(username);
+    public SingleQueryResult<Manager> findByUserName(String username) {
+        return SingleQueryResult.create(managerRepo.findByUsername(username));
     }
 
     @Override
@@ -72,7 +74,7 @@ public class ManagerServiceImpl implements ManagerService {
 
         List<Manager> managers      = mongoTemplate.find(query, Manager.class);
         long          resultCount   = managers == null ? 0 : managers.size();
-        long          totalCount    = count();
+        long          totalCount    = mongoTemplate.count(query, Manager.class);
         boolean       isEnd         = resultCount < count;
 
         return ListQueryResult.create(managers, resultCount, totalCount, isEnd);

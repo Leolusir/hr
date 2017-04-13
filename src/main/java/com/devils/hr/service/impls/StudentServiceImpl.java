@@ -1,7 +1,8 @@
 package com.devils.hr.service.impls;
 
 import com.devils.hr.pojo.roles.Student;
-import com.devils.hr.querys.Page;
+import com.devils.hr.querys.ListQueryResult;
+import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.repository.StudentRepo;
 import com.devils.hr.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +28,11 @@ public class StudentServiceImpl implements StudentService {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public Student save(Student student) {
+    public SingleQueryResult<Student> save(Student student) {
         long currentTime = System.currentTimeMillis();
         student.setUpdateTime(currentTime);
         student.setCreateTime(currentTime);
-        return studentRepo.save(student);
+        return SingleQueryResult.create(studentRepo.save(student));
     }
 
     @Override
@@ -40,8 +41,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student findOneById(String id) {
-        return studentRepo.findOne(id);
+    public SingleQueryResult<Student> findOneById(String id) {
+        return SingleQueryResult.create(studentRepo.findOne(id));
     }
 
     @Override
@@ -50,35 +51,38 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student update(Student student) {
+    public SingleQueryResult<Student> update(Student student) {
         student.setUpdateTime(System.currentTimeMillis());
-        return studentRepo.save(student);
+        return SingleQueryResult.create(studentRepo.save(student));
     }
 
     @Override
-    public Student findByNumberOrPhone(long number, String phone) {
-        return studentRepo.findByNumberOrPhone(number, phone);
+    public SingleQueryResult<Student> findByNumberOrPhone(long number, String phone) {
+        return SingleQueryResult.create(studentRepo.findByNumberOrPhone(number, phone));
     }
 
     @Override
-    public Student findByIDNumber(String IDNumber) {
-        return studentRepo.findByIDNumber(IDNumber);
+    public SingleQueryResult<Student> findByIDNumber(String IDNumber) {
+        return SingleQueryResult.create(studentRepo.findByIDNumber(IDNumber));
     }
 
     @Override
-    public List<Student> findByPageInNumber(Page page) {
+    public ListQueryResult<Student> findByPageInNumber(long startNumber, int count, int skip) {
         Criteria criteria = new Criteria();
-        criteria.andOperator(Criteria.where("number").gt(page.getCursor()));
+        criteria.andOperator(Criteria.where("number").gt(startNumber));
 
         Query query = new Query();
         query.addCriteria(criteria);
         query.with(new Sort(Sort.Direction.ASC, "number"))
-                .limit(page.getCount())
-                .skip(page.getSkip());
+                .limit(count)
+                .skip(skip);
 
         List<Student> students = mongoTemplate.find(query, Student.class);
+        long resultCount = students == null ? 0 : students.size();
+        long totalCount  = mongoTemplate.count(query, Student.class);
+        boolean isEnd    = resultCount < count;
 
-        return students;
+        return ListQueryResult.create(students, resultCount, totalCount, isEnd);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.devils.hr.service.impls;
 
 import com.devils.hr.pojo.roles.SClass;
+import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.repository.SClassRepo;
 import com.devils.hr.service.SClassService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,11 @@ public class SClassServiceImpl implements SClassService {
     private SClassRepo sClassRepo;
 
     @Override
-    public SClass save(SClass sClass) {
+    public SingleQueryResult<SClass> save(SClass sClass) {
         long currentTime = System.currentTimeMillis();
         sClass.setUpdateTime(currentTime);
         sClass.setCreateTime(currentTime);
-        return sClassRepo.save(sClass);
+        return SingleQueryResult.create(sClassRepo.save(sClass));
     }
 
     @Override
@@ -29,8 +30,8 @@ public class SClassServiceImpl implements SClassService {
     }
 
     @Override
-    public SClass findOneById(String id) {
-        return sClassRepo.findOne(id);
+    public SingleQueryResult<SClass> findOneById(String id) {
+        return SingleQueryResult.create(sClassRepo.findOne(id));
     }
 
     @Override
@@ -39,8 +40,8 @@ public class SClassServiceImpl implements SClassService {
     }
 
     @Override
-    public SClass update(SClass sClass) {
+    public SingleQueryResult<SClass> update(SClass sClass) {
         sClass.setUpdateTime(System.currentTimeMillis());
-        return sClassRepo.save(sClass);
+        return SingleQueryResult.create(sClassRepo.save(sClass));
     }
 }

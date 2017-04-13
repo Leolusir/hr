@@ -1,5 +1,9 @@
 package com.devils.hr.responses;
 
+import com.devils.hr.constants.ResponseMessage;
+import com.devils.hr.constants.ResponseStatus;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,6 +114,37 @@ public class RespWrapper {
 
         public RespWrapperBuilder addCustomParam(String name, Object value){
             _result.put(name, value);
+            return this;
+        }
+
+        //templates
+        public RespWrapperBuilder success(){
+            _status = ResponseStatus.SUCCESS;
+            _message = ResponseMessage.SUCCESS;
+            return this;
+        }
+
+        public RespWrapperBuilder missParams(String... paramNames){
+            _status = ResponseStatus.MISS_PARAMS;
+            _message = ResponseMessage.MISS_PARAMS + Arrays.toString(paramNames);
+            return this;
+        }
+
+        public RespWrapperBuilder notFound(String desc){
+            _status = ResponseStatus.NOT_FOUND;
+            _message = ResponseMessage.NOT_FOUND + desc;
+            return this;
+        }
+
+        public RespWrapperBuilder error(String message){
+            _status = ResponseStatus.ERROR_WITH_CUSTOM_MESSAGE;
+            _message = message;
+            return this;
+        }
+
+        public RespWrapperBuilder error(){
+            _status = ResponseStatus.ERROR;
+            _message = ResponseMessage.ERROR;
             return this;
         }
 

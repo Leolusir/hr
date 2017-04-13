@@ -31,7 +31,7 @@ public class RespFactory extends AbstractRespFactory{
 
     @Override
     public RespWrapper createRespParamsIsNull(String... params) {
-        return new RespWrapper(ResponseStatus.PARAMS_IS_NULL, ResponseMessage.PARAMS_IS_NULL + Arrays.toString(params));
+        return new RespWrapper(ResponseStatus.MISS_PARAMS, ResponseMessage.MISS_PARAMS + Arrays.toString(params));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class RespFactory extends AbstractRespFactory{
 
     @Override
     public RespWrapper createRespErrorWithCustomMsg(String message) {
-        return new RespWrapper(ResponseStatus.ERROR_WITH_CUNTOME_MESSAGE, message);
+        return new RespWrapper(ResponseStatus.ERROR_WITH_CUSTOM_MESSAGE, message);
     }
 
     @Override

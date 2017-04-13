@@ -2,6 +2,7 @@ package com.devils.hr.controllers.apis;
 
 import com.devils.hr.pojo.records.Exam;
 import com.devils.hr.pojo.roles.Subject;
+import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.responses.RespFactory;
 import com.devils.hr.responses.RespWrapper;
 import com.devils.hr.service.ExamService;
@@ -13,9 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by AndyL on 2017/4/5.
@@ -47,8 +45,9 @@ public class ExamApiCtrl {
                                @RequestParam(required = true)  int    year,
                                @RequestParam(required = true)  int    month,
                                @RequestParam(required = true)  int    day){
-        Subject subject = subjectService.findOneById(subjectId);
-        if(subject == null || StringUtils.isEmpty(subject.getId())){
+        SingleQueryResult<Subject> singleQueryResult = subjectService.findOneById(subjectId);
+        if(singleQueryResult.getOne() == null ||
+                StringUtils.isEmpty(singleQueryResult.getOne().getId())){
             return RespFactory.getInstance().createRespErrorWithCustomMsg("科目不存在");
         }
 
@@ -58,14 +57,14 @@ public class ExamApiCtrl {
         exam.setYear(year);
         exam.setMonth(month);
         exam.setDay(day);
-        exam.setSubject(subject);
+        exam.setSubject(singleQueryResult.getOne());
 
-        Exam newExam = examService.save(exam);
+        SingleQueryResult<Exam> examSingleQueryResult = examService.save(exam);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", newExam.getId());
-
-        return RespFactory.getInstance().createRespSuccess(result);
+        return RespWrapper.builder()
+                .success()
+                .addCustomParam("exam", examSingleQueryResult.getOne())
+                .build();
     }
 
 }

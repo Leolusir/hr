@@ -1,11 +1,9 @@
 package com.devils.hr.controllers.apis;
 
 import com.devils.hr.configs.AppConfig;
-import com.devils.hr.constants.ResponseMessage;
-import com.devils.hr.constants.ResponseStatus;
 import com.devils.hr.pojo.roles.Manager;
 import com.devils.hr.querys.ListQueryResult;
-import com.devils.hr.responses.RespFactory;
+import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.responses.RespWrapper;
 import com.devils.hr.responses.modules.ManagerResp;
 import com.devils.hr.service.ManagerService;
@@ -13,10 +11,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.Clock;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by AndyL on 2017/4/4.
@@ -41,16 +35,16 @@ public class ManagerApiCtrl {
                                      @RequestParam(required = true)  String name,
                                      @RequestParam(required = false) String desc){
         if(StringUtils.isEmpty(username)){
-            return RespFactory.getInstance().createRespParamsIsNull("username");
+            return RespWrapper.builder().missParams("username").build();
         }else if (StringUtils.isEmpty(password)){
-            return RespFactory.getInstance().createRespParamsIsNull("password");
+            return RespWrapper.builder().missParams("password").build();
         }else if (StringUtils.isEmpty(name)){
-            return RespFactory.getInstance().createRespParamsIsNull("name");
+            return RespWrapper.builder().missParams("name").build();
         }
 
-        Manager existManager = managerService.findByUserName(username);
+        Manager existManager = managerService.findByUserName(username).getOne();
         if(existManager != null && !StringUtils.isEmpty(existManager.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("用户名已被注册");
+            return RespWrapper.builder().error("用户名已被注册").build();
         }
 
         Manager manager = new Manager();
@@ -61,13 +55,12 @@ public class ManagerApiCtrl {
         manager.setRole(Manager.ROLE_READ_WRITE);
         manager.setStatus(Manager.STATUS_ACTIVATED);
 
-        Manager newManager = managerService.save(manager);
+        SingleQueryResult<Manager> singleQueryResult = managerService.save(manager);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", newManager.getId());
-        result.put("name", newManager.getName());
-
-        return RespFactory.getInstance().createRespSuccess(result);
+        return RespWrapper.builder()
+                .success()
+                .addCustomParam("manager", singleQueryResult.convertToResp(ManagerResp.class))
+                .build();
     }
 
     /**
@@ -80,32 +73,29 @@ public class ManagerApiCtrl {
     public RespWrapper login(@RequestParam(required = true) String username,
                              @RequestParam(required = true) String password){
         if(StringUtils.isEmpty(username)){
-            return RespFactory.getInstance().createRespParamsIsNull("username");
+            return RespWrapper.builder().missParams("username").build();
         }else if (StringUtils.isEmpty(password)){
-            return RespFactory.getInstance().createRespParamsIsNull("password");
+            return RespWrapper.builder().missParams("password").build();
         }
 
-        Manager existManager = managerService.findByUserName(username);
+        SingleQueryResult<Manager> singleQueryResult = managerService.findByUserName(username);
+        Manager existManager = singleQueryResult.getOne();
 
         if(existManager == null || StringUtils.isEmpty(existManager.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("用户名或密码错误");
+            return RespWrapper.builder().error("用户名或密码错误").build();
         }
 
         if(!password.equals(existManager.getPassword())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("用户名或密码错误");
+            return RespWrapper.builder().error("用户名或密码错误").build();
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", existManager.getId());
-        result.put("name", existManager.getName());
-        result.put("role", existManager.getRole());
-        result.put("desc", existManager.getDesc());
-        result.put("lastLoginTime", existManager.getLastLoginTime());
-
-        existManager.setLastLoginTime(Clock.systemDefaultZone().millis());
+        existManager.setLastLoginTime(System.currentTimeMillis());
         managerService.update(existManager);
 
-        return RespFactory.getInstance().createRespSuccess(result);
+        return RespWrapper.builder()
+                .success()
+                .addCustomParam("manager", singleQueryResult.convertToResp(ManagerResp.class))
+                .build();
     }
 
     /**
@@ -115,22 +105,19 @@ public class ManagerApiCtrl {
     @ApiOperation(value = "获取单个管理员信息", notes = "根据 id 获取单个管理员信息")
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public RespWrapper findById(@PathVariable String id){
-        Manager manager = managerService.findOneById(id);
-        if(manager == null || StringUtils.isEmpty(manager.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("未找到该管理员");
+        SingleQueryResult<Manager> singleQueryResult = managerService.findOneById(id);
+        if(singleQueryResult.getOne() == null ||
+                StringUtils.isEmpty(singleQueryResult.getOne().getId())){
+            return RespWrapper.builder().notFound("未找到该管理员").build();
         }
-        if(manager.getRole().equals(Manager.ROLE_ROOT)){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("没有权限查看该管理员信息");
+        if(singleQueryResult.getOne().getRole().equals(Manager.ROLE_ROOT)){
+            return RespWrapper.builder().error("没有权限查看该管理员信息").build();
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", manager.getId());
-        result.put("name", manager.getName());
-        result.put("desc", manager.getDesc());
-        result.put("role", manager.getRole());
-        result.put("lastLoginTime", manager.getLastLoginTime());
-
-        return RespFactory.getInstance().createRespSuccess(result);
+        return RespWrapper.builder()
+                .success()
+                .addCustomParam("manager", singleQueryResult.convertToResp(ManagerResp.class))
+                .build();
     }
 
     /**
@@ -150,8 +137,7 @@ public class ManagerApiCtrl {
         ListQueryResult<Manager> managers = managerService.findByPageInUpdateTime(cursor, count, skip);
 
         return RespWrapper.builder()
-                .setStatus(ResponseStatus.SUCCESS)
-                .setMessage(ResponseMessage.SUCCESS)
+                .success()
                 .addIsEnd(managers.isEnd())
                 .addCount(managers.getCount())
                 .addTotalCount(managers.getTotalCount())
@@ -167,18 +153,22 @@ public class ManagerApiCtrl {
     @ApiOperation(value = "删除某个管理员", notes = "根据 id 删除管理员")
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public RespWrapper deleteById(@PathVariable String id){
-        Manager manager = managerService.findOneById(id);
+        SingleQueryResult<Manager> singleQueryResult = managerService.findOneById(id);
+        Manager manager = singleQueryResult.getOne();
+
         if(manager == null || StringUtils.isEmpty(manager.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("未找到该管理员");
+            return RespWrapper.builder().notFound("未找到该管理员").build();
         }
         if(manager.getRole().equals(Manager.ROLE_ROOT)
                 || manager.getRole().equals(Manager.ROLE_ADMIN)){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("无法删除系统管理员");
+            return RespWrapper.builder().error("无法删除系统管理员").build();
         }
 
         managerService.deleteById(id);
 
-        return RespFactory.getInstance().createRespSuccess();
+        return RespWrapper.builder()
+                .success()
+                .build();
     }
 
 }

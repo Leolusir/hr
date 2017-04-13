@@ -2,6 +2,7 @@ package com.devils.hr.service;
 
 import com.devils.hr.pojo.roles.Manager;
 import com.devils.hr.querys.ListQueryResult;
+import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.service.base.BaseService;
 
 /**
@@ -12,7 +13,7 @@ public interface ManagerService extends BaseService<Manager> {
     /**
      * 根据 Username 查找 manager
      * */
-    Manager findByUserName(String username);
+    SingleQueryResult<Manager> findByUserName(String username);
 
     /**
      * 分页查询 按 updateTime 索引

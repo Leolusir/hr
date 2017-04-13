@@ -3,9 +3,10 @@ package com.devils.hr.controllers.apis;
 import com.devils.hr.configs.AppConfig;
 import com.devils.hr.pojo.roles.Manager;
 import com.devils.hr.pojo.roles.Student;
+import com.devils.hr.querys.ListQueryResult;
+import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.responses.RespFactory;
 import com.devils.hr.responses.RespWrapper;
-import com.devils.hr.querys.Page;
 import com.devils.hr.responses.modules.StudentResp;
 import com.devils.hr.service.ManagerService;
 import com.devils.hr.service.StudentService;
@@ -13,11 +14,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by AndyL on 2017/4/2.
@@ -48,30 +44,30 @@ public class StudentApiCtrl {
                                      @RequestParam(required = true) String birthday,
                                      @RequestParam(required = true) String IDNumber){
         if(StringUtils.isEmpty(managerId)){
-            return RespFactory.getInstance().createRespParamsIsNull("managerId");
+            return RespWrapper.builder().missParams("managerId").build();
         }else if(StringUtils.isEmpty(name)){
-            return RespFactory.getInstance().createRespParamsIsNull("name");
+            return RespWrapper.builder().missParams("name").build();
         }else if(StringUtils.isEmpty(gender)){
-            return RespFactory.getInstance().createRespParamsIsNull("gender");
+            return RespWrapper.builder().missParams("gender").build();
         }else if(StringUtils.isEmpty(birthday)){
-            return RespFactory.getInstance().createRespParamsIsNull("birthday");
+            return RespWrapper.builder().missParams("birthday").build();
         }else if(StringUtils.isEmpty(IDNumber)){
-            return RespFactory.getInstance().createRespParamsIsNull("IDNumber");
+            return RespWrapper.builder().missParams("IDNumber").build();
         }
 
-        Manager manager = managerService.findOneById(managerId);
+        Manager manager = managerService.findOneById(managerId).getOne();
         if(manager == null || StringUtils.isEmpty(manager.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("只有管理员才能操作");
+            return RespWrapper.builder().error("只有管理员才能操作").build();
         }
 
         if(Manager.ROLE_READ.equals(manager.getRole())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("没有足够的权限");
+            return RespWrapper.builder().error("没有足够的权限").build();
         }
 
-        Student existStudent = studentService.findByIDNumber(IDNumber);
+        Student existStudent = studentService.findByIDNumber(IDNumber).getOne();
 
         if(existStudent != null && !StringUtils.isEmpty(existStudent.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("学生已存在,请检查学生姓名和身份证号填写是否有误");
+            return RespWrapper.builder().error("学生已存在,请检查学生姓名和身份证号填写是否有误").build();
         }
 
         Student student = new Student();
@@ -83,17 +79,12 @@ public class StudentApiCtrl {
         student.setNumber(studentService.generateNumber());
         student.setPassword(AppConfig.INIT_PASSWORD_MD5);
 
-        Student newStudent = studentService.save(student);
+        SingleQueryResult<Student> singleQueryResult = studentService.save(student);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", newStudent.getId());
-        result.put("name", newStudent.getName());
-        result.put("gender", newStudent.getGender());
-        result.put("birthday", newStudent.getBirthday());
-        result.put("number", String.valueOf(newStudent.getNumber()));
-        result.put("IDNumber", newStudent.getIDNumber());
-
-        return RespFactory.getInstance().createRespSuccess(result);
+        return RespWrapper.builder()
+                .success()
+                .addCustomParam("student", singleQueryResult.getOne())
+                .build();
     }
 
     /**
@@ -107,28 +98,28 @@ public class StudentApiCtrl {
                              @RequestParam(required = false) String phone,
                              @RequestParam(required = true)  String password){
         if(number < 1 && StringUtils.isEmpty(phone)){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("请输入手机号或学号");
+            return RespWrapper.builder().missParams("请输入手机号或学号").build();
         }
 
         if(StringUtils.isEmpty(password)){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("请输入密码");
+            return RespWrapper.builder().missParams("请输入密码").build();
         }
 
-        Student student = studentService.findByNumberOrPhone(number, phone);
+        SingleQueryResult<Student> singleQueryResult = studentService.findByNumberOrPhone(number, phone);
+        Student student = singleQueryResult.getOne();
 
         if(student == null || StringUtils.isEmpty(student.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("未找到该学生相关信息，检查手机号或学号填写是否有误");
+            return RespWrapper.builder().notFound("未找到该学生相关信息，检查手机号或学号填写是否有误").build();
         }
 
         if(!password.equals(student.getPassword())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("密码错误");
+            return RespWrapper.builder().error("密码错误").build();
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", student.getId());
-        result.put("name", student.getName());
-
-        return RespFactory.getInstance().createRespSuccess(result);
+        return RespWrapper.builder()
+                .success()
+                .addCustomParam("student", singleQueryResult.convertToResp(StudentResp.class))
+                .build();
     }
 
     /**
@@ -138,18 +129,17 @@ public class StudentApiCtrl {
     @ApiOperation(value = "查询学生信息", notes = "根据 id 查询学生信息")
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     public RespWrapper findById(@PathVariable String id){
-        Student student = studentService.findOneById(id);
+        SingleQueryResult<Student> singleQueryResult = studentService.findOneById(id);
+        Student student = singleQueryResult.getOne();
+
         if(student == null || StringUtils.isEmpty(student.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("未查到该学生的信息");
+            return RespWrapper.builder().notFound("未查到该学生的信息").build();
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", student.getId());
-        result.put("name", student.getName());
-        result.put("number", student.getNumber());
-        result.put("birthday", student.getBirthday());
-
-        return RespFactory.getInstance().createRespSuccess(result);
+        return RespWrapper.builder()
+                .success()
+                .addCustomParam("student", singleQueryResult.convertToResp(StudentResp.class))
+                .build();
     }
 
     /**
@@ -165,27 +155,16 @@ public class StudentApiCtrl {
                                           @RequestParam(required = false, defaultValue = "0") int  skip){
         if(count  == 0) count  = AppConfig.defaultDataQueryCount;
 
-        Page page = new Page(cursor, skip, count);
-        List<Student> students = studentService.findByPageInNumber(page);
-        Boolean isEnd = students == null || students.size() < count;
+        ListQueryResult<Student> listQueryResult = studentService.findByPageInNumber(cursor, count, skip);
 
-        Map<String, Object> result = new HashMap<>();
-        if(students == null || students.size() < 1){
-            result.put("isEnd", isEnd);
-            result.put("cursor", 0);
-            result.put("count", 0);
-            return RespFactory.getInstance().createRespSuccess(result);
-        }
-
-        List<StudentResp> studentRespList = new ArrayList<>();
-        students.forEach(student -> studentRespList.add(new StudentResp(student)));
-
-        result.put("isEnd", isEnd);
-        result.put("cursor", isEnd ? 0 : students.get(students.size() - 1).getNumber());
-        result.put("count", studentRespList.size());
-        result.put("students", studentRespList);
-
-        return RespFactory.getInstance().createRespSuccess(result);
+        return RespWrapper.builder()
+                .success()
+                .addCount(listQueryResult.getCount())
+                .addTotalCount(listQueryResult.getTotalCount())
+                .addIsEnd(listQueryResult.isEnd())
+                .addCursor(listQueryResult.getLastElement() == null ? 0 : listQueryResult.getLastElement().getNumber())
+                .addCustomParam("students", listQueryResult.convertToResp(StudentResp.class))
+                .build();
     }
 
     /**
@@ -195,9 +174,9 @@ public class StudentApiCtrl {
     @ApiOperation(value = "删除学生", notes = "根据 id 删除学生信息")
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
     public RespWrapper deleteById(@PathVariable String id){
-        Student student = studentService.findOneById(id);
+        Student student = studentService.findOneById(id).getOne();
         if(student == null || StringUtils.isEmpty(student.getId())){
-            return RespFactory.getInstance().createRespErrorWithCustomMsg("未查到该学生");
+            return RespWrapper.builder().notFound("未查到该学生").build();
         }
 
         studentService.deleteById(id);

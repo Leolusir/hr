@@ -1,5 +1,7 @@
 package com.devils.hr.service.base;
 
+import com.devils.hr.querys.SingleQueryResult;
+
 /**
  * Created by AndyL on 2017/4/2.
  */
@@ -8,7 +10,7 @@ public interface BaseService<T> {
     /**
      * 增
      * */
-    T save(T t);
+    SingleQueryResult<T> save(T t);
 
     /**
      * 删
@@ -18,13 +20,13 @@ public interface BaseService<T> {
     /**
      * 查
      * */
-    T findOneById(String id);
+    SingleQueryResult<T> findOneById(String id);
 
     long count();
 
     /**
      * 改
      * */
-    T update(T t);
+    SingleQueryResult<T> update(T t);
 
 }

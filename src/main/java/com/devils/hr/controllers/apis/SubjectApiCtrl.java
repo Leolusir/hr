@@ -1,7 +1,7 @@
 package com.devils.hr.controllers.apis;
 
 import com.devils.hr.pojo.roles.Subject;
-import com.devils.hr.responses.RespFactory;
+import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.responses.RespWrapper;
 import com.devils.hr.service.SubjectService;
 import io.swagger.annotations.ApiOperation;
@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by AndyL on 2017/4/5.
@@ -37,14 +34,12 @@ public class SubjectApiCtrl {
         subject.setName(name);
         subject.setDesc(desc);
 
-        Subject newSub = subjectService.save(subject);
+        SingleQueryResult<Subject> singleQueryResult = subjectService.save(subject);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", newSub.getId());
-        result.put("name", newSub.getName());
-        result.put("desc", newSub.getDesc());
-
-        return RespFactory.getInstance().createRespSuccess(result);
+        return RespWrapper.builder()
+                .success()
+                .addCustomParam("subject", singleQueryResult.getOne())
+                .build();
     }
 
 }

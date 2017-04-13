@@ -48,6 +48,10 @@ public class ListQueryResult<T> {
         return list;
     }
 
+    public T getLastElement(){
+        return (list == null || list.size() < 1) ? null : list.get(list.size() - 1);
+    }
+
     public long getCount() {
         return count;
     }

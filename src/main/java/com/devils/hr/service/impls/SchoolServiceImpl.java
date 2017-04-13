@@ -1,6 +1,7 @@
 package com.devils.hr.service.impls;
 
 import com.devils.hr.pojo.roles.School;
+import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.repository.SchoolRepo;
 import com.devils.hr.service.SchoolService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,11 @@ public class SchoolServiceImpl implements SchoolService {
     private SchoolRepo schoolRepo;
 
     @Override
-    public School save(School school) {
+    public SingleQueryResult<School> save(School school) {
         long currentTime = System.currentTimeMillis();
         school.setUpdateTime(currentTime);
         school.setCreateTime(currentTime);
-        return schoolRepo.save(school);
+        return SingleQueryResult.create(schoolRepo.save(school));
     }
 
     @Override
@@ -29,8 +30,8 @@ public class SchoolServiceImpl implements SchoolService {
     }
 
     @Override
-    public School findOneById(String id) {
-        return schoolRepo.findOne(id);
+    public SingleQueryResult<School> findOneById(String id) {
+        return SingleQueryResult.create(schoolRepo.findOne(id));
     }
 
     @Override
@@ -39,9 +40,9 @@ public class SchoolServiceImpl implements SchoolService {
     }
 
     @Override
-    public School update(School school) {
+    public SingleQueryResult<School> update(School school) {
         school.setUpdateTime(System.currentTimeMillis());
-        return schoolRepo.save(school);
+        return SingleQueryResult.create(schoolRepo.save(school));
     }
 
 }

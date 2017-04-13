@@ -1,6 +1,5 @@
 package com.devils.hr.controllers.apis;
 
-import com.devils.hr.responses.RespFactory;
 import com.devils.hr.responses.RespWrapper;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.util.StringUtils;
@@ -22,10 +21,12 @@ public class SchoolApiCtrl {
     @RequestMapping(method = RequestMethod.GET)
     public RespWrapper getById(@RequestParam(required = true) String id){
         if(StringUtils.isEmpty(id)){
-            return RespFactory.getInstance().createRespParamsIsNull("id");
+            return RespWrapper.builder().missParams("id").build();
         }
 
-        return new RespWrapper(1001, "success");
+        return RespWrapper.builder()
+                .success()
+                .build();
     }
 
 }

@@ -7,9 +7,9 @@ public class ResponseMessage {
 
     public static final String SUCCESS = "success";
 
-    public static final String PARAMS_IS_NULL = "params is null : ";
+    public static final String MISS_PARAMS = "miss params : ";
 
-    public static final String NOT_FOUND = "not found";
+    public static final String NOT_FOUND = "not found : ";
 
     public static final String ERROR   = "server error";
 

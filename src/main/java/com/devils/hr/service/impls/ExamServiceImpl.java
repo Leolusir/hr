@@ -1,6 +1,7 @@
 package com.devils.hr.service.impls;
 
 import com.devils.hr.pojo.records.Exam;
+import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.repository.ExamRepo;
 import com.devils.hr.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,11 @@ public class ExamServiceImpl implements ExamService {
     private ExamRepo examRepo;
 
     @Override
-    public Exam save(Exam exam) {
+    public SingleQueryResult<Exam> save(Exam exam) {
         long currentTime = System.currentTimeMillis();
         exam.setUpdateTime(currentTime);
         exam.setCreateTime(currentTime);
-        return examRepo.save(exam);
+        return SingleQueryResult.create(examRepo.save(exam));
     }
 
     @Override
@@ -29,8 +30,8 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Exam findOneById(String id) {
-        return examRepo.findOne(id);
+    public SingleQueryResult<Exam> findOneById(String id) {
+        return SingleQueryResult.create(examRepo.findOne(id));
     }
 
     @Override
@@ -39,8 +40,8 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Exam update(Exam exam) {
+    public SingleQueryResult<Exam> update(Exam exam) {
         exam.setUpdateTime(System.currentTimeMillis());
-        return examRepo.save(exam);
+        return SingleQueryResult.create(examRepo.save(exam));
     }
 }

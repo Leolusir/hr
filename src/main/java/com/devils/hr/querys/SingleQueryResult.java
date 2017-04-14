@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Created by AndyL on 2017/4/13.
  */
-public class SingleQueryResult<T> {
+public class SingleQueryResult<T>{
 
     private T one;
 
@@ -35,4 +35,5 @@ public class SingleQueryResult<T> {
     public void setOne(T one) {
         this.one = one;
     }
+
 }

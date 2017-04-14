@@ -10,14 +10,19 @@ import com.devils.hr.responses.modules.StudentResp;
 import com.devils.hr.service.ManagerService;
 import com.devils.hr.service.StudentService;
 import io.swagger.annotations.ApiOperation;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.Min;
 
 /**
  * Created by AndyL on 2017/4/2.
  */
 @RestController
+@Validated
 @RequestMapping("/api/v1/student")
 public class StudentApiCtrl {
 
@@ -37,22 +42,11 @@ public class StudentApiCtrl {
      * */
     @ApiOperation(value = "创建学生信息", notes = "创建学生信息 tips: 性别 => 'f' or 'm' 出生日期 => 'yyyy-mm-dd'")
     @RequestMapping(method = RequestMethod.POST)
-    public RespWrapper createStudent(@RequestParam(required = true) String managerId,
-                                     @RequestParam(required = true) String name,
-                                     @RequestParam(required = true) String gender,
-                                     @RequestParam(required = true) String birthday,
-                                     @RequestParam(required = true) String IDNumber){
-        if(StringUtils.isEmpty(managerId)){
-            return RespWrapper.builder().missParams("managerId").build();
-        }else if(StringUtils.isEmpty(name)){
-            return RespWrapper.builder().missParams("name").build();
-        }else if(StringUtils.isEmpty(gender)){
-            return RespWrapper.builder().missParams("gender").build();
-        }else if(StringUtils.isEmpty(birthday)){
-            return RespWrapper.builder().missParams("birthday").build();
-        }else if(StringUtils.isEmpty(IDNumber)){
-            return RespWrapper.builder().missParams("IDNumber").build();
-        }
+    public RespWrapper createStudent(@NotEmpty @RequestParam(required = true) String managerId,
+                                     @NotEmpty @RequestParam(required = true) String name,
+                                     @NotEmpty @RequestParam(required = true) String gender,
+                                     @NotEmpty @RequestParam(required = true) String birthday,
+                                     @NotEmpty @RequestParam(required = true) String IDNumber){
 
         Manager manager = managerService.findOneById(managerId).getOne();
         if(manager == null || StringUtils.isEmpty(manager.getId())){
@@ -93,16 +87,9 @@ public class StudentApiCtrl {
      * */
     @ApiOperation(value = "学生登陆", notes = "学生登陆")
     @RequestMapping(method = RequestMethod.POST, value = "/login")
-    public RespWrapper login(@RequestParam(required = false) long   number,
-                             @RequestParam(required = false) String phone,
-                             @RequestParam(required = true)  String password){
-        if(number < 1 && StringUtils.isEmpty(phone)){
-            return RespWrapper.builder().missParams("请输入手机号或学号").build();
-        }
-
-        if(StringUtils.isEmpty(password)){
-            return RespWrapper.builder().missParams("请输入密码").build();
-        }
+    public RespWrapper login(@Min(value = 0) @RequestParam(required = false) long   number,
+                                             @RequestParam(required = false) String phone,
+                             @NotEmpty       @RequestParam(required = true)  String password){
 
         SingleQueryResult<Student> singleQueryResult = studentService.findByNumberOrPhone(number, phone);
         Student student = singleQueryResult.getOne();
@@ -127,7 +114,8 @@ public class StudentApiCtrl {
      * */
     @ApiOperation(value = "查询学生信息", notes = "根据 id 查询学生信息")
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public RespWrapper findById(@PathVariable String id){
+    public RespWrapper findById(@NotEmpty @PathVariable String id){
+
         SingleQueryResult<Student> singleQueryResult = studentService.findOneById(id);
         Student student = singleQueryResult.getOne();
 
@@ -149,9 +137,9 @@ public class StudentApiCtrl {
      * */
     @ApiOperation(value = "学号顺序查询所有学生", notes = "cursor 首次请求传 0 ，之后服务端会返回新的 cursor 供前段下次请求, count 每次请求消息条数，不传默认为20")
     @RequestMapping(method = RequestMethod.GET, value = "/list")
-    public RespWrapper findByPageInNumber(@RequestParam(required = true,  defaultValue = "0") long cursor,
-                                          @RequestParam(required = false, defaultValue = "0") int  count,
-                                          @RequestParam(required = false, defaultValue = "0") int  skip){
+    public RespWrapper findByPageInNumber(@Min(value = 0) @RequestParam(required = true,  defaultValue = "0") long cursor,
+                                          @Min(value = 0) @RequestParam(required = false, defaultValue = "0") int  count,
+                                          @Min(value = 0) @RequestParam(required = false, defaultValue = "0") int  skip){
         if(count  == 0) count  = AppConfig.defaultDataQueryCount;
 
         ListQueryResult<Student> listQueryResult = studentService.findByPageInNumber(cursor, count, skip);
@@ -172,7 +160,7 @@ public class StudentApiCtrl {
      * */
     @ApiOperation(value = "删除学生", notes = "根据 id 删除学生信息")
     @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public RespWrapper deleteById(@PathVariable String id){
+    public RespWrapper deleteById(@NotEmpty @PathVariable String id){
         Student student = studentService.findOneById(id).getOne();
         if(student == null || StringUtils.isEmpty(student.getId())){
             return RespWrapper.builder().notFound("未查到该学生").build();

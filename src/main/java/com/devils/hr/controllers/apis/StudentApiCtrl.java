@@ -1,13 +1,18 @@
 package com.devils.hr.controllers.apis;
 
 import com.devils.hr.configs.AppConfig;
+import com.devils.hr.pojo.records.RefStuPar;
 import com.devils.hr.pojo.roles.Manager;
+import com.devils.hr.pojo.roles.Parent;
 import com.devils.hr.pojo.roles.Student;
 import com.devils.hr.querys.ListQueryResult;
 import com.devils.hr.querys.SingleQueryResult;
+import com.devils.hr.request.StudentReqMod;
 import com.devils.hr.responses.RespWrapper;
 import com.devils.hr.responses.modules.StudentResp;
 import com.devils.hr.service.ManagerService;
+import com.devils.hr.service.ParentService;
+import com.devils.hr.service.RefStuParService;
 import com.devils.hr.service.StudentService;
 import io.swagger.annotations.ApiOperation;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -32,23 +37,21 @@ public class StudentApiCtrl {
     @Autowired
     private ManagerService managerService;
 
+    @Autowired
+    private ParentService parentService;
+
+    @Autowired
+    private RefStuParService refStuParService;
+
     /**
      * 创建学生信息
-     * @param managerId 管理员ID
-     * @param name      姓名
-     * @param gender    性别  'f' or 'm'
-     * @param birthday  出生  'yyyy-mm-dd'
-     * @param IDNumber  身份证号
+     * @param student 学生信息
      * */
-    @ApiOperation(value = "创建学生信息", notes = "创建学生信息 tips: 性别 => 'f' or 'm' 出生日期 => 'yyyy-mm-dd'")
+    @ApiOperation(value = "创建学生信息", notes = "创建学生信息")
     @RequestMapping(method = RequestMethod.POST)
-    public RespWrapper createStudent(@NotEmpty @RequestParam(required = true) String managerId,
-                                     @NotEmpty @RequestParam(required = true) String name,
-                                     @NotEmpty @RequestParam(required = true) String gender,
-                                     @NotEmpty @RequestParam(required = true) String birthday,
-                                     @NotEmpty @RequestParam(required = true) String IDNumber){
+    public RespWrapper createStudent(@RequestBody StudentReqMod student){
 
-        Manager manager = managerService.findOneById(managerId).getOne();
+        Manager manager = managerService.findOneById(student.getManagerId()).getOne();
         if(manager == null || StringUtils.isEmpty(manager.getId())){
             return RespWrapper.builder().error("只有管理员才能操作").build();
         }
@@ -57,26 +60,18 @@ public class StudentApiCtrl {
             return RespWrapper.builder().error("没有足够的权限").build();
         }
 
-        Student existStudent = studentService.findByIDNumber(IDNumber).getOne();
 
-        if(existStudent != null && !StringUtils.isEmpty(existStudent.getId())){
-            return RespWrapper.builder().error("学生已存在,请检查学生姓名和身份证号填写是否有误").build();
+        SingleQueryResult<Student> saveStudentResult = studentService.saveByReqMod(student);
+        ListQueryResult<Parent> saveParentResult = parentService.saveAllByReqMod(student.getParentsInfo());
+        for (Parent parent : saveParentResult.getList()) {
+            RefStuPar refStuPar = new RefStuPar();
+            refStuPar.setStudent(saveStudentResult.getOne());
+            refStuPar.setParent(parent);
+            refStuParService.save(refStuPar);
         }
-
-        Student student = new Student();
-        student.setStatus(Student.STATUS_INACTIVATED);
-        student.setName(name);
-        student.setGender(gender);
-        student.setBirthday(birthday);
-        student.setIDNumber(IDNumber);
-        student.setNumber(studentService.generateNumber());
-        student.setPassword(AppConfig.INIT_PASSWORD_MD5);
-
-        SingleQueryResult<Student> singleQueryResult = studentService.save(student);
 
         return RespWrapper.builder()
                 .success()
-                .addCustomParam("student", singleQueryResult.getOne())
                 .build();
     }
 

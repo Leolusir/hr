@@ -4,11 +4,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * Created by AndyL on 2017/4/5.
- * 科目
+ * Created by AndyL on 2017/4/14.
+ * 学生家长
  */
-@Document(collection = "subject")
-public class Subject {
+@Document(collection = "parent")
+public class Parent {
+
+    public static final int STATUS_INACTIVE = 0;    //未激活 即未修改密码
+
+    public static final int STATUS_ACTIVE   = 1;
 
     @Id
     private String id;
@@ -19,17 +23,23 @@ public class Subject {
 
     private String desc;
 
+    private String phone;
+
+    private String password;
+
     private long   updateTime;
 
     private long   createTime;
 
-    public Subject() {}
+    public Parent() {}
 
-    public Subject(String id, int status, String name, String desc, long updateTime, long createTime) {
+    public Parent(String id, int status, String name, String desc, String phone, String password, long updateTime, long createTime) {
         this.id = id;
         this.status = status;
         this.name = name;
         this.desc = desc;
+        this.phone = phone;
+        this.password = password;
         this.updateTime = updateTime;
         this.createTime = createTime;
     }
@@ -66,6 +76,22 @@ public class Subject {
         this.desc = desc;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public long getUpdateTime() {
         return updateTime;
     }
@@ -84,11 +110,12 @@ public class Subject {
 
     @Override
     public String toString() {
-        return "Subject{" +
+        return "Parent{" +
                 "id='" + id + '\'' +
-                ", status=" + status +
                 ", name='" + name + '\'' +
                 ", desc='" + desc + '\'' +
+                ", phone='" + phone + '\'' +
+                ", password='" + password + '\'' +
                 ", updateTime=" + updateTime +
                 ", createTime=" + createTime +
                 '}';

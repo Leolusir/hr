@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Created by AndyL on 2017/4/4.
+ * 后台管理员
  */
 @Document(collection = "manager")
 public class Manager {

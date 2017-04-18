@@ -30,6 +30,16 @@ public class ListQueryResult<T> {
         return listQueryResult;
     }
 
+    public static <R> ListQueryResult<R> create(List<R> list, long count, long totalCount){
+        ListQueryResult<R> listQueryResult = new ListQueryResult<>();
+        listQueryResult.setList(list == null ? new ArrayList<>() : list);
+        listQueryResult.setCount(count);
+        listQueryResult.setTotalCount(totalCount);
+        listQueryResult.setEnd(true);
+
+        return listQueryResult;
+    }
+
     public <W> List<W> convertToResp(Class<W> respModule){
         List<W> respList = new ArrayList<>();
         list.forEach(t -> {

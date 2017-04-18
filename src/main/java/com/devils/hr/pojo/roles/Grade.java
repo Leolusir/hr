@@ -4,16 +4,18 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * Created by AndyL on 2017/4/5.
- * 科目
+ * Created by AndyL on 2017/4/18.
+ * 年级
  */
-@Document(collection = "subject")
-public class Subject {
+@Document(collection = "grade")
+public class Grade {
 
     @Id
     private String id;
 
     private int    status;
+
+    private int    sortNum;
 
     private String name;
 
@@ -23,11 +25,12 @@ public class Subject {
 
     private long   createTime;
 
-    public Subject() {}
+    public Grade() {}
 
-    public Subject(String id, int status, String name, String desc, long updateTime, long createTime) {
+    public Grade(String id, int status, int sortNum, String name, String desc, long updateTime, long createTime) {
         this.id = id;
         this.status = status;
+        this.sortNum = sortNum;
         this.name = name;
         this.desc = desc;
         this.updateTime = updateTime;
@@ -48,6 +51,14 @@ public class Subject {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public int getSortNum() {
+        return sortNum;
+    }
+
+    public void setSortNum(int sortNum) {
+        this.sortNum = sortNum;
     }
 
     public String getName() {
@@ -84,9 +95,10 @@ public class Subject {
 
     @Override
     public String toString() {
-        return "Subject{" +
+        return "Grade{" +
                 "id='" + id + '\'' +
                 ", status=" + status +
+                ", sortNum=" + sortNum +
                 ", name='" + name + '\'' +
                 ", desc='" + desc + '\'' +
                 ", updateTime=" + updateTime +

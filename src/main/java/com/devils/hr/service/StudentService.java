@@ -3,6 +3,7 @@ package com.devils.hr.service;
 import com.devils.hr.pojo.roles.Student;
 import com.devils.hr.querys.ListQueryResult;
 import com.devils.hr.querys.SingleQueryResult;
+import com.devils.hr.request.StudentReqMod;
 import com.devils.hr.service.base.BaseService;
 
 /**
@@ -32,5 +33,12 @@ public interface StudentService extends BaseService<Student> {
      * 生成学号
      * */
     long generateNumber();
+
+    /**
+     * 创建新学生
+     * @see com.devils.hr.controllers.apis.StudentApiCtrl#createStudent(StudentReqMod)
+     * @see com.devils.hr.request.StudentReqMod
+     * */
+    SingleQueryResult<Student> saveByReqMod(StudentReqMod studentReqMod);
 
 }

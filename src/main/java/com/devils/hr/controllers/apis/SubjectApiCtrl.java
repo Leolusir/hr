@@ -31,8 +31,8 @@ public class SubjectApiCtrl {
      * */
     @ApiOperation(value = "添加科目", notes = "添加科目")
     @RequestMapping(method = RequestMethod.POST)
-    public RespWrapper addSubject(@NotEmpty @RequestParam(required = true) String name,
-                                  @RequestParam(required = false) String desc){
+    public RespWrapper addSubject(@NotEmpty @RequestParam(required = true)  String name,
+                                            @RequestParam(required = false) String desc){
         Subject subject = new Subject();
         subject.setName(name);
         subject.setDesc(desc);

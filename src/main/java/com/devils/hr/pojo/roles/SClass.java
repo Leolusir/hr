@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Created by AndyL on 2017/4/4.
+ * 班级
  */
 @Document(collection = "sclass")
 public class SClass {

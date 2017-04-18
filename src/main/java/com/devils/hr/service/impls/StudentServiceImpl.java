@@ -1,9 +1,11 @@
 package com.devils.hr.service.impls;
 
+import com.devils.hr.configs.AppConfig;
 import com.devils.hr.pojo.roles.Student;
 import com.devils.hr.querys.ListQueryResult;
 import com.devils.hr.querys.SingleQueryResult;
 import com.devils.hr.repository.StudentRepo;
+import com.devils.hr.request.StudentReqMod;
 import com.devils.hr.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -11,8 +13,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,9 +34,19 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public SingleQueryResult<Student> save(Student student) {
+        student.setNumber(generateNumber());//生成学号
+        if(StringUtils.isEmpty(student.getPassword())){
+            //初始密码
+            student.setStatus(Student.STATUS_INACTIVE);
+            student.setPassword(AppConfig.INIT_PASSWORD_MD5);
+        }
         long currentTime = System.currentTimeMillis();
+        SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-DD");
+        String admissionTime = format.format(new Date(currentTime));
+        student.setAdmissionTime(admissionTime);
         student.setUpdateTime(currentTime);
         student.setCreateTime(currentTime);
+
         return SingleQueryResult.create(studentRepo.save(student));
     }
 
@@ -92,5 +107,14 @@ public class StudentServiceImpl implements StudentService {
         long count = count();
 
         return year * 1000000 + count + 1;
+    }
+
+    @Override
+    public SingleQueryResult<Student> saveByReqMod(StudentReqMod studentReqMod) {
+        Student student = new Student();
+        student.setName(studentReqMod.getName());
+        student.setDesc(studentReqMod.getDesc());
+
+        return save(student);
     }
 }

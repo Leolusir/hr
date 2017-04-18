@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Created by AndyL on 2017/4/2.
+ * 学生
  */
 @Document(collection = "student")
 public class Student {
@@ -14,8 +15,8 @@ public class Student {
     /**
      * 状态
      * */
-    public static final int STATUS_INACTIVATED = 0;    //未激活 即未绑定手机号
-    public static final int STATUS_ACTIVATED = 1;      //已激活
+    public static final int STATUS_INACTIVE = 0;    //未激活 即未绑定手机号
+    public static final int STATUS_ACTIVE = 1;      //已激活
 
     @Id private String id;
 
@@ -29,6 +30,8 @@ public class Student {
 
     private String name;
 
+    private String desc;
+
     private String gender;
 
     private String birthday;    //yyyy-mm-dd
@@ -40,6 +43,8 @@ public class Student {
 
     private String address;     //联络地址
 
+    private String admissionTime;    //入学时间 yyyy-mm-dd
+
     private long   updateTime;
 
     private long   createTime;
@@ -47,18 +52,20 @@ public class Student {
 
     public Student() {}
 
-    public Student(String id, int status, String phone, String password, Image photo, String name, String gender, String birthday, long number, String IDNumber, String address, long updateTime, long createTime) {
+    public Student(String id, int status, String phone, String password, Image photo, String name, String desc, String gender, String birthday, long number, String IDNumber, String address, String admissionTime, long updateTime, long createTime) {
         this.id = id;
         this.status = status;
         this.phone = phone;
         this.password = password;
         this.photo = photo;
         this.name = name;
+        this.desc = desc;
         this.gender = gender;
         this.birthday = birthday;
         this.number = number;
         this.IDNumber = IDNumber;
         this.address = address;
+        this.admissionTime = admissionTime;
         this.updateTime = updateTime;
         this.createTime = createTime;
     }
@@ -111,6 +118,14 @@ public class Student {
         this.name = name;
     }
 
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
     public String getGender() {
         return gender;
     }
@@ -151,6 +166,14 @@ public class Student {
         this.address = address;
     }
 
+    public String getAdmissionTime() {
+        return admissionTime;
+    }
+
+    public void setAdmissionTime(String admissionTime) {
+        this.admissionTime = admissionTime;
+    }
+
     public long getUpdateTime() {
         return updateTime;
     }
@@ -176,11 +199,13 @@ public class Student {
                 ", password='" + password + '\'' +
                 ", photo=" + photo +
                 ", name='" + name + '\'' +
+                ", desc='" + desc + '\'' +
                 ", gender='" + gender + '\'' +
                 ", birthday='" + birthday + '\'' +
                 ", number=" + number +
                 ", IDNumber='" + IDNumber + '\'' +
                 ", address='" + address + '\'' +
+                ", admissionTime='" + admissionTime + '\'' +
                 ", updateTime=" + updateTime +
                 ", createTime=" + createTime +
                 '}';

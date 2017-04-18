@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Created by AndyL on 2017/4/2.
+ * 老师
  */
 @Document(collection = "teacher")
 public class Teacher {
